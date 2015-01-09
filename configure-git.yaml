@@ -1,0 +1,11 @@
+---
+  tasks:
+  - name: Install Git
+    yum: name=git state=present
+
+# - name: Configure Git
+    command: git config --gloabl user.name "passion4aix"
+    command: git config --global user.email "passion4aix@gmail.com"
+
+  - name: Gitconfig H:/my-git-code
+    command: 
