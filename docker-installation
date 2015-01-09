@@ -1,0 +1,11 @@
+---
+- hosts:
+
+  tasks:
+  - name: Install Docker
+    yum: name=docker-io state=present
+  
+  - name: start docker service
+    service: name=docker state=started enabled=true
+    
+  
