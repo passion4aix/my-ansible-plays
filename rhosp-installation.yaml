@@ -1,0 +1,28 @@
+---
+# This ansible playbook will be used to install RedHat OpenStack Installer to deploy
+# RedHat Openstack Platform 5 (Icehouse release on top of RedHat Enterprise Linux 7)
+
+hosts: rhosp-installer
+
+  tasks:
+    - name: Disable NetworkManager.service
+      service: name=NetworkManager state=stopped enabled=false
+
+    - name: Modify the interface configurations
+      lineinfile: line="ON_BOOT=yes" dest=/etc/sysconfig/network-scripts/ifcfg-eth0
+      lineinfile: line="NM_CONTROLLED=no" dest=/etc/sysconfig/network-scripts/ifcfg-eth0
+# Need to use the vars or with_items option to modify all interfaces or parse the 
+# information from the facts/setup module and dynamically substitute the interfaces.
+
+    - name: Enable network service
+      service: name=network.service state=started enabled=true
+
+    - name: Remove dnsmasq as it might conflict with rhosp-installer dns service
+      yum: name=dnsmasq state=absent
+
+    - name: Register with RHN using subscription-manager
+      redhat_subscription: state=present
+                           username=unixsoe@csc.com
+                           password=$rhn-pass
+                           activationkey=$rhn-key
+                           pool=

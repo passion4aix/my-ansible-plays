@@ -1,0 +1,38 @@
+---
+  - hosts: remote
+
+    vars_prompt:
+      - name: gateway_server
+        prompt: "what's the gateway"
+        private: no
+
+      - name: nameserver_1
+        prompt: "what's the primary DNS server IP? (DNS1)"
+        private: no
+
+      - name: nameserver_2
+        prompt: "what's the alternate DNS server IP? (DNS2)"
+        private: no
+        default: "8.8.8.8"
+
+      - name: hostname
+        prompt: "what's the hostname of the server?"
+        private: no
+
+      - name: netmask
+        prompt: "what's the netmask? (ex: 255.255.255.0)"
+        private: no
+
+    tasks:
+      - name: configure gateway
+        lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-eth0 line='GATEWAY={{ gateway_server }}'
+
+      - name: configure netmask
+        lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-eth0 line='NETMASK={{netmask}}'
+
+      - name: configure nameserver
+        lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-eth0 line='DNS1={{nameserver_1}}'
+        lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-eth0 line='DNS1={{nameserver_2}}'
+
+      - name: configure hostname
+        lineinfile: dest=/etc/sysconfig/network line='HOSTNAME={{hostname}}'

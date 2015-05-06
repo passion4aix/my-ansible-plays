@@ -1,0 +1,30 @@
+#!/bin/bash
+#       Helper script for creating Service Databases
+
+X="$1"
+Y="$2"
+Z="$3"
+myname="osp_sql_create.sh"
+
+S0="\n${myname} {db_name} {dbuser_name}] [{password}]\n\n\t{db_name}\tName of New Database\n\n\t{dbuser_name}\tName of DB User\n\t\t\t(may or not match DB Name)\n\n\t{password}\tPassword\n\t\t\t(defaults to 'redhat')\n"
+if [ "${X}" == "" ] ; then echo -e "${S0}" ; exit 127 ; fi
+if [ "${Y}" == "" ] ; then echo -e "${S0}" ; exit 127 ; fi
+[ "${Z}" == "" ] && Z="redhat"
+
+#       Filename
+dtstamp="`date +%Y%m%d_%H%M%S`"
+myfile="/root/${X}.sql"
+touch ${myfile}
+if [ $? -ne 0 ] ; then echo -e "${myname}(ERROR):  Can NOT create file (${myfile})" ; exit 63 ; fi
+
+#       Write file
+echo "CREATE DATABASE ${X};" >> ${myfile}
+echo "GRANT ALL ON ${X}.* TO '${Y}'@'`uname -n`' IDENTIFIED BY '${Z}';" >> ${myfile}
+echo "GRANT ALL ON ${X}.* TO '${Y}'@'%' IDENTIFIED BY '${Z}';" >> ${myfile}
+echo "GRANT ALL ON ${X}.* TO '${Y}'@'localhost' IDENTIFIED BY '${Z}';" >> ${myfile}
+echo "FLUSH PRIVILEGES;" >> ${myfile}
+echo "quit" >> ${myfile}
+echo -e ""
+cat ${myfile}
+echo -e "\n# Verify the preceding MySQL commands are correct.\n# Then execute the following command to create the database."
+echo -e "\nmysql -u root -p < ${myfile}\n"
